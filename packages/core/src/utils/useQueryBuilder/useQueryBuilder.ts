@@ -54,6 +54,7 @@ const useQueryBuilder = <T>({
 
     return onError as (error: ApiError) => void;
   };
+  
   const onSuccessBuilder = () => {
     if (isStrFn(onSuccess))
       return convertFn<OnSuccessBuilderFn<AxiosResponse<T, unknown>>>(

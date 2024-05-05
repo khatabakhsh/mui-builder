@@ -70,7 +70,7 @@ const apiBuilder = async <Data>({
 
   return apiInstance<Data>({
     ...configs,
-    url: urlBuilder(),
+    url: urlBuilder(),  
     data: dataBuilder(),
     params: paramsBuilder(),
     headers: headersBuilder(),

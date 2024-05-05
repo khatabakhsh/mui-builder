@@ -1,3 +1,5 @@
+// import { FormBuilderProps } from 'packages/core/src/components/builder/builder.types';
+
 import { Link, Route, Routes } from 'react-router-dom';
 
 import { Stack } from '@mui/material';
@@ -6,6 +8,121 @@ import Builder, { BuilderProps } from '@mui-builder/core';
 
 export function App() {
   const children: BuilderProps[] = [
+import { Builder, FormBuilderProps } from '@mui-builder/core';
+import { Checkbox, IconButton } from '@mui/material';
+import { ColumnDef } from '@tanstack/react-table';
+import { IconChevronDown } from '@tabler/icons-react';
+import { Person, makeData } from './makeData';
+
+const columns: ColumnDef<Person>[] = [
+  {
+    id: 'expander',
+    size: 0,
+    enableHiding: false,
+    enableResizing: false,
+    header: () => null,
+    cell: ({ row }) => {
+      return row.getCanExpand() ? (
+        <IconButton
+          {...{
+            onClick: row.getToggleExpandedHandler(),
+            sx: { cursor: 'pointer', transform: row.getIsExpanded() ? 'rotate(180deg)' : '', ml: '2px' }
+          }}
+        >
+        <IconChevronDown />
+        </IconButton>
+      ) : (
+        <IconButton disabled>
+          <IconChevronDown opacity={0.5} />
+        </IconButton>
+      );
+    }
+  },
+  {
+    id: 'select',
+    size: 0,
+    enableHiding: false,
+    enableResizing: false,
+    header: ({ table }) => (
+      <Checkbox
+        size="small"
+        {...{
+          checked: table?.getIsAllRowsSelected(),
+          indeterminate: table?.getIsSomeRowsSelected(),
+          onChange: table?.getToggleAllRowsSelectedHandler()
+        }}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        size="small"
+        {...{
+          checked: row?.getIsSelected(),
+          disabled: !row.getCanSelect(),
+          indeterminate: row.getIsSomeSelected(),
+          onChange: row.getToggleSelectedHandler()
+        }}
+      />
+    )
+  },
+  {
+    id: 'firstName',
+    accessorKey: 'firstName',
+    header: 'نام',
+    cell: (info) => info.getValue(),
+    minSize: 160,
+    size: 160
+  },
+  {
+    id: 'lastName',
+    accessorKey: 'lastName',
+    header: 'نام خانوادگی',
+    cell: (info) => info.getValue(),
+    minSize: 190,
+    size: 190
+  },
+  {
+    id: 'age',
+    accessorKey: 'age',
+    header: 'سن',
+    cell: (info) => info.getValue(),
+    minSize: 90,
+    size: 90
+  },
+  {
+    id: 'visits',
+    accessorKey: 'visits',
+    header: 'تعداد نمایش',
+    cell: (info) => info.getValue()
+  },
+  {
+    id: 'status',
+    accessorKey: 'status',
+    header: 'وضعیت',
+    cell: (info) => info.getValue()
+  },
+  {
+    id: 'progress',
+    accessorKey: 'progress',
+    header: 'درصد',
+    cell: (info) => info.getValue(),
+    minSize: 110,
+    size: 110
+  }
+];
+
+export function App() {
+  const tableBuilderJson: FormBuilderProps[] = [{
+    id: "table-test",
+    groupType: 'table',
+    type: 'table',
+    props: {
+      id: "test",
+      columns,
+      data: makeData(100),
+    }
+  }]
+  const groupList: FormBuilderProps[] = [
     // Fields
     {
       id: 'form-field-1',
@@ -13,21 +130,20 @@ export function App() {
       type: 'field-text',
       props: {
         id: 'Field-One',
-        formId: '20',
+        formId: '20', 
         label: 'Field One (Form Id: 20)',
         dependesies: ['FieldTwo'],
         script: `
-          if(formMethod.getValues()?.FieldTwo === "erfan"){
-            setProps('FieldTwo' , {label:'i can'});
-            return {};
+          if(forms?.[21].getValues()?.FieldTwo === "erfan"){
+            return {
+                label: "blue"
+            }
           }`,
         api: {
           configs: {
             url: `return ("https://jsonplaceholder.typicode.com/todo8888s/" + formMethod.getValues()?.FieldTwo);`,
             method: 'post',
-            data: {
-              test: '1',
-            },
+            data:`return  formMethod.getValues();`,
           },
           queries: {
             enable: `
@@ -174,6 +290,7 @@ export function App() {
           </li>
           <li>
             <Link to="/grid">Grid</Link>
+            <Link to="/table">Table</Link>
           </li>
           <li>
             <Link to="/utils">Utils</Link>
@@ -201,9 +318,17 @@ export function App() {
           element={
             <Stack direction="row" alignItems="flex-end">
               <Builder children={children} />
+            <Stack direction="column" alignItems="flex-end">
+              <Builder groupList={groupList} />
+              <Builder groupList={tableBuilderJson} />
             </Stack>
           }
         />
+        {/* <Route path="/table" element={<Table />} /> */}
+        <Route path="/" element={<div>
+          <Builder groupList={groupList} />
+          <Builder groupList={groupList} />
+        </div>} />
       </Routes>
     </div>
   );
